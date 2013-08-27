@@ -1,25 +1,13 @@
 MetaTagsBundle
 ==============
 
-Symfony2 Bundle to manage html meta tags by path matching. This bundle manages relative paths, and not absolute urls.
+CopiaincollaMetaTagsBundle is a Symfony2 bundle built to help you manage html meta tags for SEO purposes.
 
 # How it works
 
-You, as developer, specify the paths you want to be visible to admins in a reserved area of your website. Then an admin can manually set meta tags values for a concrete path, or define some regex rules to be applied to apths. You can also set some meta tags in yout twig templates.
+Given a path (eg. __"/en/contact"__), you can specify the html meta tags you want to be displayed in the related web page.
 
-
-MetaTagsBundle __loads__ some urls and manages the association between an __url__ and its __meta tags values__ storing the data in the database.
-
-To choose which urls must be managed by MetaTagsBundle, you must __load__ the __routes__ generating them. There are some different methods to achieve this:
-
-- load all the routes of a bundle by including the bundle name in `config.yml`
-- for each route, specify the option `ci_metatags_expose` in the Route annotation
-
-For routes requiring parameters that must be fetched from database, there's the possibility to load entities from database, and associate the route parameters to the entities values in order to create urls.
-
-For more specific needs, it is also possible to create a custom service which simply returns an array of urls.
-
-Once the urls are loaded in MetaTagsBundle, you will be able to associate the following meta tags to each url:
+This is the list of meta tags currently supported by CopiaincollaMetaTagsBundle:
 
 - __title__
 - __description__
@@ -32,17 +20,23 @@ Once the urls are loaded in MetaTagsBundle, you will be able to associate the fo
 - __og:description__
 - __og:image__
 
-It is possible to specify default values for each meta tag, used when a url has no or partially meta tags specified by the user.
 
-__Note:__ This bundle is in __beta__ state at the moment, in test phase and almost ready for the first release.
+You, as developer, specify the paths you want to be managed. Then through web interface you can manually set meta tags values for a concrete path, or define some regex rules to be applied to paths. You can also set meta tags values in twig templates.
 
----
+When a url is requested, it happens the following:
 
-## Changelog
+- path is extracted (eg. __"/en/contact"__) and used to calculate the right meta tags to display
+- for each supported meta tag:
+ - if the exact path exists in database, load stored value
+ - else, regex rules matching the given path are applied (in order of importance); the first non-null value for that meta tag is loaded
+ - else, value is loaded from twig template
+ - else, meta tag is not displayed
+
+### Changelogs
 
 20/08/2013 - Version 1.1
 
-In this date the version 1.1 is shipped! The most important introduction is the possibility to define cascading regex rules for default meta tag values.
+Most important introduction is the possibility to define cascading regex rules for default meta tag values.
 
 05/04/2013 - Version 1.0
 
@@ -54,85 +48,106 @@ THe work on this bundle begins, now in alpha state.
 
 ---
 
-## Install
+# How to install
 
-Installation instructions can be found in [Installation](Resources/doc/install.md).
+The `master` branch and the `X.Y` tags are compatible with `Symfony >= 2.2.*`.
 
-The current version (master branch) of this bundle is compatible with Symfony >= 2.2.*
+To choose the right version of this bundle to install, have a look at [Tagging and Branching system explanation.](tagging_branching.md)
 
-#### Tag notes
+Read more about tags [here](Resources/doc/tagging_branching.md).
 
-We will try to provide tags as best as we can, to be used proficiently with composer or deps.
-
-The development of this bundle is intended for Symfony versions >= 2.0.*; here is a brief explanation of the tagging system we use:
-
-- tags with the __"X.Y"__ format are compatible with `Symfony >= 2.2.*`
-- tags with the __"S2.0/X.Y"__ format are compatible with `Symfony 2.0.*`
-- tags with the __"S2.1/X.Y"__ format are compatible with `Symfony 2.1.*`
-
-If you are using symfony 2.0.*, follow [this guide on the symfony-2.0.x branch](https://github.com/copiaincolla/MetaTagsBundle/blob/symfony-2.0.x/README.md).
-
-If you are using symfony 2.1.*, follow [this guide on the symfony-2.1.x branch](https://github.com/copiaincolla/MetaTagsBundle/blob/symfony-2.1.x/README.md).
-
-More details about _tagging and branching system_ used in CopiaincollaMetaTagsBundle can be found in [Tagging and Branching system explanation](Resources/doc/tagging_branching.md).
-
-## Configure
-
-To configure this bundle, read [Configuration](Resources/doc/configuration.md) for all possible values.
-
-The default meta tag values are configurable by web interface, at url `/metatags/defaults`.
-
-## Load urls
-
-To generate urls starting by all routes contained in a bundle, just add the bundle name to `config.yml`, as explained [here](Resources/doc/configuration.md#copiaincolla_meta_tags--urls_loader--exposed_routes).
-
-You can also add a single route by specifying an option in the Route annotation, like this:
+### 1a) using composer
+If you are using `composer`, add the following line to your `composer.json`:
 
 ```
-@Route("/product/{id}/{slug}", name="product_show", options={"ci_metatags_expose"=true})
+{
+    "require": {
+        "copiaincolla/metatags-bundle": "X.Y"
+    }
+}
 ```
 
-Through this option, you can also choose __not__ to generate urls from a specific route:
+NOTE: substitute `"X.Y"` with the most recent tag or the concrete tag you want to use (view the list of available tags [here](https://github.com/copiaincolla/MetaTagsBundle/tags)).
+
+Then run:
 
 ```
-@Route("/product/{id}/{slug}", name="product_show", options={"ci_metatags_expose"=false})
+php composer.phar update
 ```
+### 1b) using deps
 
-You can also generate urls for associating meta tags by fetching data from database; read the section [Configuration#dynamic_routes](Resources/doc/configuration.md#copiaincolla_meta_tags--urls_loader--parameters--dynamic_routes).
-
-Finally, you can also create your custom __urls loader__ service, by following [this guide](Resources/doc/custom_urls_loader_service.md).
-
-### Display help message to user
-
-You can specify a @Route option to display a message in the edit page, just use the `ci_metatags_help` options:
+If you are using `deps`, add the following line to your `deps`:
 
 ```
-@Route("/product/{id}/{slug}", name="product_show", options={"ci_metatags_help"="This urls represents a product. Use {{ entity.title }} to print the title of a product"})
+[CopiaincollaMetaTagsBundle]
+    git=https://github.com/copiaincolla/MetaTagsBundle.git
+    target=/bundles/Copiaincolla/MetaTagsBundle
+    version=X.Y
 ```
 
-
-## Usage in the templates
-
-Currently only twig is supported.
-
-In the template containing an `<head>` tag, simply add:
+And in your `app/autoload.php`:
 
 ```
-<body>
-    <head>
-        {% render controller('CopiaincollaMetaTagsBundle:MetaTags:render') %}
-        [...]
-    </head>
-
-    [...]
-</body>
+'Copiaincolla'   => __DIR__.'/../vendor/bundles',
 ```
 
-To overwrite the default meta tags and the custom meta tags inserted by web interface, you can specify the `inlineMetatags` variable:
+### 2) AppKernel.php
+
+Load the bundle by adding this to `app/AppKernel.php`:
+
+    new Copiaincolla\MetaTagsBundle\CopiaincollaMetaTagsBundle(),
+
+### 3) Import routing
+
+Add the following line to `app/routing.yml`:
 
 ```
-{% render controller('CopiaincollaMetaTagsBundle:MetaTags:render', { 'inlineMetatags': {'title': 'New foo title'} }) %}
+# CopiaincollaMetaTagsBundle
+ci_metatags_bundle:
+    resource: "@CopiaincollaMetaTagsBundle/Resources/config/routing.yml"
 ```
 
+#### 4) Add copiaincolla_meta_tags configuration
 
-For a better explanation of usage in templates and advanced use, read [Template usage](Resources/doc/template_usage.md).
+Add to `app/config.yml`:
+
+```
+copiaincolla_meta_tags: ~
+```
+
+#### 5) Update database
+
+Update the database schema by running:
+
+```
+php app/console doctrine:schema:update --force
+```
+
+The bundle is now ready to work!
+
+---
+
+#  Usage
+
+No path is managed by default by MetaTagsBundle: you need to __load__ the paths and associate (by web interface) the proper meta tags values.
+
+There are some methods you can use to __load__ the paths in MetaTagsBundle:
+
+- _load all the routes of a bundle_ by including the bundle name in `config.yml`
+- _load dynamic routes_ (eg. referred to some entities) setting the required parameters in `config.yml`
+- _for each route_, set the option `ci_metatags_expose` in the `Route annotation`
+- generate paths through a `custom service`
+
+To start using this bundle, follow the [Usage](Resources/doc/usage.md) documentation.
+
+# Resources
+
+[How to use this bundle](Resources/doc/usage.md)
+
+[Configuration reference](Resources/doc/configuration.md)
+
+Cookbook:
+
+- [Use a custom service to load paths](Resources/doc/custom_urls_loader_service.md)
+- [Console usage](Resources/doc/console.md)
+- [Change the path of restricted area](Resources/doc/custom_admin_prefix.md)

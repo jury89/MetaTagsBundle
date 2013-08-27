@@ -3,7 +3,7 @@ Tagging and Branching system explanation
 
 # Tags
 
-We will try to provide tags as best as we can, to be used proficiently with composer or deps.
+We will try to provide tags to be used proficiently with composer and deps.
 
 The development of this bundle is intended for Symfony versions >= 2.0.*; here is a brief explanation of the tagging system we use:
 
