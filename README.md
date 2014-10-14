@@ -5,7 +5,7 @@ Symfony2 Bundle to manage html meta tags by path matching. This bundle manages r
 
 # How it works
 
-You, as developer, specify the paths you want to be visible to admins in a reserved area of your website. Then an admin can manually set meta tags values for a concrete path, or define some regex rules to be applied to apths. You can also set some meta tags in yout twig templates.
+You, as developer, specify the paths you want to be visible to admins in a reserved area of your website. Then an admin can manually set meta tags values for a concrete path, or define some regex rules to be applied to paths. You can also set some meta tags in yout twig templates.
 
 
 MetaTagsBundle __loads__ some urls and manages the association between an __url__ and its __meta tags values__ storing the data in the database.
